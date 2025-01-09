@@ -1,2 +1,2 @@
 # Nataleng
-Gioco di farm con gui
+Gioco di farm scritto in classi

@@ -1,6 +1,7 @@
 import random
 import time
 import art
+import json
 from termcolor import colored
 
 # ASCII Art for the game title
@@ -12,8 +13,8 @@ print(Art_c)
 class Player:
     def __init__(self):
         self.armor_equipped = ""
-        self.money = 15000000
-        self.coins = 10000000
+        self.money = 15
+        self.coins = 1
         self.bonus_multiplier = 1
         self.godpass = False
         self.sword_equipped = ""
@@ -23,6 +24,8 @@ class Player:
         self.power_ups = POWER_UPS
         self.armor = ARMOR
 
+
+
     def format_price(self, price) -> str:
         if price >= 1_000_000:
             return colored(f"${price/1_000_000:.1f}M", "yellow")
@@ -30,6 +33,8 @@ class Player:
             return colored(f"${price/1_000:.1f}K", "yellow")
         else:
             return colored(f"${price}", "yellow")
+        
+        
 
     def equip_sword(self, sword_name):
         if sword_name in self.new_swords:
@@ -96,10 +101,36 @@ class Game:
         print(colored("-2 Shop", "cyan"))
         print(colored("-3 Fight", "light_blue"))
         print(colored("- 4 Quit", "light_magenta"))
-        money_c = colored(f"Money: ${self.player.money}", "light_yellow")
-        coins_c = colored(f"Coins: £{self.player.coins}", "yellow")
+        print(colored("-----------","light_blue"))
+        print(colored("-5 Save Game","light_blue"))
+        print(colored("-6 Load Game","cyan"))
+        money_c = colored(f"Money: {self.player.format_price(self.player.money)}","light_yellow")
+        coins_c = colored(f"Coins: {self.player.format_price(self.player.coins)}", "yellow")
         print(money_c)
         print(coins_c)
+
+
+    def save_game(self, filename='save_game.json'):
+        with open(filename, 'w') as f:
+            game_state = {
+                'player': self.player.__dict__,
+                'world': self.world.__dict__
+            }
+            json.dump(game_state, f)
+            print("Game saved successfully.")
+
+    def load_game(self, filename='save_game.json'):
+        try:
+            with open(filename, 'r') as f:
+                game_state = json.load(f)
+                self.player.__dict__.update(game_state['player'])
+                self.world.__dict__.update(game_state['world'])
+                print("Game loaded successfully.")
+        except FileNotFoundError:
+            print("Save file not found. Please save your game first.")
+        except json.JSONDecodeError:
+            print("Error loading the game. The save file may be corrupted.")
+
 
     def shop(self):
         print(colored("------------", "cyan"))
@@ -404,6 +435,13 @@ class Game:
                 print(colored("Leaving...", "cyan"))
                 time.sleep(0.5)
                 self.running = False
+
+
+            elif choice == "5":
+                self.save_game()  # Save game 
+
+            elif choice == "6":
+                self.load_game()
 
         print(colored("Goodbye! Thanks for playing Untitled Farming Game.", "blue"))
 

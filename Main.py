@@ -20,7 +20,7 @@ class Player:
         self.sword_equipped = ""
         self.player_hp = 100
         self.player_damage = 0
-        self.new_swords = NEW_SWORDS
+        self.swords = SWORDS
         self.power_ups = POWER_UPS
         self.armor = ARMOR
 
@@ -37,16 +37,16 @@ class Player:
         
 
     def equip_sword(self, sword_name):
-        if sword_name in self.new_swords:
-            if self.new_swords[sword_name]["stock"] > 0:
-                if self.new_swords[sword_name]["damage"] < self.player_damage:
-                    self.money -= self.new_swords[sword_name]["price"]
-                    self.new_swords[sword_name]["stock"] -= 1
+        if sword_name in self.swords:
+            if self.swords[sword_name]["stock"] > 0:
+                if self.swords[sword_name]["damage"] < self.player_damage:
+                    self.money -= self.swords[sword_name]["price"]
+                    self.swords[sword_name]["stock"] -= 1
                     print(colored(f"You bought {sword_name} but did not equip it as it's weaker.", "red"))
                 else:
                     self.sword_equipped = sword_name
-                    self.player_damage = self.new_swords[sword_name]["damage"]
-                    self.new_swords[sword_name]["stock"] -= 1
+                    self.player_damage = self.swords[sword_name]["damage"]
+                    self.swords[sword_name]["stock"] -= 1
                     print(colored(f"Equipped {sword_name}. Player Damage increased to {self.player_damage}!", "green"))
             else:
                 print(colored(f"{sword_name} is out of stock.", "red"))
@@ -100,7 +100,7 @@ class Game:
         print(colored("-1 Farm", "green"))
         print(colored("-2 Shop", "cyan"))
         print(colored("-3 Fight", "light_blue"))
-        print(colored("- 4 Quit", "light_magenta"))
+        print(colored("-4 Quit", "light_magenta"))
         print(colored("-----------","light_blue"))
         print(colored("-5 Save Game","light_blue"))
         print(colored("-6 Load Game","cyan"))
@@ -118,7 +118,8 @@ class Game:
             }
             json.dump(game_state, f)
             print("Game saved successfully.")
-
+            
+            
     def load_game(self, filename='save_game.json'):
         try:
             with open(filename, 'r') as f:
@@ -132,29 +133,33 @@ class Game:
             print("Error loading the game. The save file may be corrupted.")
 
 
+
+
     def shop(self):
         print(colored("------------", "cyan"))
-        print(colored("Welcome to the Shop!", "cyan"))
+        print(colored("Welcome to the Shop!", "green"))
         print(colored("------------", "cyan"))
-        print(colored("Available Swords:", "light_cyan"))
-        for sword, details in self.player.new_swords.items():
+        print(colored("Available Swords:", "light_blue"))
+        for sword, details in self.player.swords.items():
             print(f"{sword}: {self.player.format_price(details['price'])} (Stock: {details['stock']})")
         print(colored("------------", "cyan"))
         print(colored("Available Armor:", "light_cyan"))
         for armor, details in self.player.armor.items():
             print(f"{armor}: {self.player.format_price(details['price'])} (Stock: {details['stock']})")
         print(colored("------------", "cyan"))
-        print(colored("Available Power-Ups:", "light_cyan"))
+        print(colored("Available Power-Ups:", "light_red"))
         for power_up, details in self.player.power_ups.items():
             print(f"{power_up}: {self.player.format_price(details['price'])} (Stock: {details['stock']})")
 
         choice = input(colored("What would you like to buy? (Enter the item name or Enter to leave): ", "cyan")).strip().lower()
        
+
+
         # Handle sword purchase
-        for sword in self.player.new_swords:
+        for sword in self.player.swords:
             if sword.lower() == choice:
-                sword_price = self.player.new_swords[sword]["price"]
-                if self.player.money >= sword_price and self.player.new_swords[sword]["stock"] > 0:
+                sword_price = self.player.swords[sword]["price"]
+                if self.player.money >= sword_price and self.player.swords[sword]["stock"] > 0:
                     self.player.money -= sword_price
                     self.player.equip_sword(sword)
                     print(colored(f"You bought {sword}!", "green"))
@@ -162,6 +167,8 @@ class Game:
                 else:
                     print(colored("You don't have enough money or the item is out of stock.", "red"))
                 return
+            
+
 
         # Handle armor purchase
         for armor in self.player.armor:
@@ -175,6 +182,8 @@ class Game:
                     print(colored("You don't have enough money or the item is out of stock.", "red"))
                 return
 
+
+
         # Handle power-up purchase
         for power_up in self.player.power_ups:
             if power_up.lower() == choice:
@@ -182,35 +191,44 @@ class Game:
                 if self.player.money >= power_up_price and self.player.power_ups[power_up]["stock"] > 0:
                     self.player.money -= power_up_price
                     self.player.power_ups[power_up]["stock"] -= 1
+
                    
                     if power_up == "X2Pass":
                         self.player.bonus_multiplier *= 2
                         print(colored("You bought the X2Pass successfully! Now you will get 2x for all your earnings!", "green"))
                         self.player.power_ups[power_up]["price"] *= 2
+
                    
                     print(colored(f"You bought {power_up}!", "green"))
+
                 else:
                     print(colored("You don't have enough money or the item is out of stock.", "red"))
+
                 return
            
         if choice == 'exit':
             print(colored("Exiting the shop.", "yellow"))
+
         else:
             print(colored("Invalid choice. Please try again.", "red"))
+
 
     def initiate_battle(self, enemy_name, enemy_hp):
         player_hp = self.player.player_hp
         if self.player.armor_equipped:
             player_hp += self.player.armor[self.player.armor_equipped]["hp"]
 
+
         print(colored(f"You've encountered a {enemy_name} with {enemy_hp} HP!", "light_red"))
         time.sleep(1)
+
 
         while player_hp > 0 and enemy_hp > 0:
             # Attack
             enemy_hp -= self.player.player_damage
             print(colored(f"You attacked {enemy_name} and dealt {self.player.player_damage} damage!", "green"))
             time.sleep(1)
+
 
             if enemy_hp <= 0:
                 print(colored(f"The {enemy_name} died!", "green"))
@@ -228,6 +246,7 @@ class Game:
                 print(colored("You Died.", "red"))
                 return 0  
         return 0  
+
 
     def calculate_loot(self, enemy_name):
         loot = 0
@@ -252,6 +271,8 @@ class Game:
         elif enemy_name == "Shadow Entity":
             loot = random.randint(100000, 150000)
         return loot
+
+
 
     def run(self):
         while self.running:
@@ -278,11 +299,15 @@ class Game:
                     print(colored("5. Void", "magenta"))
                 else:
                     print(colored("5. Void (Unlock for $1M)", "magenta"))
+                    
                
                 world_choice = input(colored("Enter your choice: ", "cyan"))
 
+
                 if world_choice == "1":
                     self.world.explore("Forest", self.player)
+
+
                 elif world_choice == "2":
                     if not self.world.cave_unlocked and self.player.money >= 15000:
                         self.player.money -= 15000
@@ -292,6 +317,8 @@ class Game:
                         self.world.explore("Cave", self.player)
                     else:
                         print(colored("Sorry, you don't have enough money to unlock the Cave.", "red"))
+
+
                 elif world_choice == "3":
                     if not self.world.jungle_unlocked and self.player.money >= 50000:
                         self.player.money -= 50000
@@ -301,6 +328,8 @@ class Game:
                         self.world.explore("Jungle", self.player)
                     else:
                         print(colored("Sorry, you don't have enough money to unlock the Jungle.", "red"))
+
+
                 elif world_choice == "4":
                     if not self.world.desert_unlocked and self.player.money >= 250000:
                         self.player.money -= 250000
@@ -310,6 +339,8 @@ class Game:
                         self.world.explore("Desert", self.player)
                     else:
                         print(colored("Sorry, you don't have enough money to unlock the Desert.", "red"))
+
+
                 elif world_choice == "5":
                     if not self.world.void_unlocked and self.player.money >= 1000000:
                         self.player.money -= 1000000
@@ -320,10 +351,15 @@ class Game:
                     else:
                         print(colored("Sorry, you don't have enough money to unlock the Void.", "red"))
 
+
+
             elif choice == "2":
                 self.shop()
 
+
+
             elif choice == "3":
+
                 if self.player.sword_equipped != "":
                     print(colored("Select World:", "blue"))
                     print(colored("1. Forest", "green"))
@@ -346,6 +382,7 @@ class Game:
                    
                     world_choice = input(colored("Enter your choice: ", "cyan"))
 
+
                     if world_choice == "1":
                         print(colored("Entering the forest...", "green"))
                         while True:
@@ -356,6 +393,7 @@ class Game:
                             user_input = input(colored("Write 'E' to stop fighting: ", "cyan"))
                             if user_input.lower() == "e":
                                 break
+
 
                     elif world_choice == "2":
                         if not self.world.cave_unlocked and self.player.coins >= 15000:
@@ -375,6 +413,7 @@ class Game:
                             if user_input.lower() == "e":
                                 break
 
+
                     elif world_choice == "3":
                         if not self.world.jungle_unlocked and self.player.coins >= 50000:
                             self.player.coins -= 50000
@@ -393,6 +432,8 @@ class Game:
                             if user_input.lower() == "e":
                                 break
 
+
+
                     elif world_choice == "4":
                         if not self.world.desert_unlocked and self.player.coins >= 250000:
                             self.player.coins -= 250000
@@ -410,6 +451,8 @@ class Game:
                             user_input = input(colored("Write 'E' to stop fighting: ", "cyan"))
                             if user_input.lower() == "e":
                                 break
+
+
 
                     elif world_choice == "5":
                         if not self.world.void_unlocked and self.player.coins >= 1000000:
@@ -431,6 +474,7 @@ class Game:
                 else:
                     print(colored("You can't fight without a sword, buy one at the shop.", "red"))
 
+
             elif choice == "4":
                 print(colored("Leaving...", "cyan"))
                 time.sleep(0.5)
@@ -441,12 +485,12 @@ class Game:
                 self.save_game()  # Save game 
 
             elif choice == "6":
-                self.load_game()
+                self.load_game()  # Load game 
 
         print(colored("Goodbye! Thanks for playing Untitled Farming Game.", "blue"))
 
 # Data Definitions
-NEW_SWORDS = {
+SWORDS = {
     "Wooden Sword": {"price": 15000, "stock": 1, "damage": 75},
     "Legendary Sword": {"price": 100000, "stock": 1, "damage": 350},
     "Excalibur": {"price": 500000, "stock": 1, "damage": 1000}

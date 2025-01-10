@@ -234,19 +234,19 @@ class Game:
                 if self.world.cave_unlocked:
                     print(colored("2. Cave", "light_cyan"))
                 else:
-                    print(colored("2. Cave (Unlock for £15K)", "light_cyan"))
+                    print(colored("2. Cave (Unlock for $15K)", "light_cyan"))
                 if self.world.jungle_unlocked:
                     print(colored("3. Jungle", "light_green"))
                 else:
-                    print(colored("3. Jungle (Unlock for £50K)", "light_green"))
+                    print(colored("3. Jungle (Unlock for $50K)", "light_green"))
                 if self.world.desert_unlocked:
                     print(colored("4. Desert", "yellow"))
                 else:
-                    print(colored("4. Desert (Unlock for £250K)", "yellow"))
+                    print(colored("4. Desert (Unlock for $250K)", "yellow"))
                 if self.world.void_unlocked:
                     print(colored("5. Void", "magenta"))
                 else:
-                    print(colored("5. Void (Unlock for £1M)", "magenta"))
+                    print(colored("5. Void (Unlock for $1M)", "magenta"))
                
                 world_choice = input(colored("Enter your choice: ", "cyan"))
 
@@ -377,7 +377,7 @@ class Game:
                             coins_gained = self.initiate_battle(random_enemy, random.randint(1200, 1600))
                             self.player.coins += coins_gained
                             user_input = input(colored("Write 'E' to stop fighting: ", "cyan"))
-                            if user _input.lower() == "e":
+                            if user_input.lower() == "e":
                                 break
 
                     elif world_choice == "5":
